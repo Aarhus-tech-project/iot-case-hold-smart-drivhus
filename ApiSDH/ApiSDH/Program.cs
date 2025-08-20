@@ -1,14 +1,18 @@
+using ApiSDH.DI;
+using ApiSDH.MIddleware;
+using Application.DI;
 using Infrastructure.DI;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddPresentation(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
 
 var app = builder.Build();
 
@@ -18,8 +22,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
-
-
-// kig i gammel app, se hvda vi skal have 
+app.UseHttpsRedirection();
 app.Run();

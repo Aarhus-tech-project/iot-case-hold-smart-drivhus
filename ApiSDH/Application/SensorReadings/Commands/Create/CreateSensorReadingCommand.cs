@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Factories;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models;
-using Application.SensorReadings.Commands.Dtos;
+using Application.SensorReadings.Dtos;
 using MediatR;
 
 namespace Application.SensorReadings.Commands.Create;
