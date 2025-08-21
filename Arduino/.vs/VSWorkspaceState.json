@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\build",
+    "\\build\\uno_r4_wifi",
+    "\\include",
+    "\\lib",
+    "\\src",
+    "\\test"
+  ],
+  "SelectedNode": "\\src\\main.cpp",
+  "PreviewInSolutionExplorer": false
+}
