@@ -10,7 +10,6 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining<CreateSensorReadingCommand>();
-        services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(CreateSensorReadingCommand).Assembly); });
 
         services.AddAutoMapper(cfg => { },
             typeof(MappingProfile).Assembly

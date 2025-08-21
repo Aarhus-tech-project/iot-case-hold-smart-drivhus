@@ -9,6 +9,12 @@ public static class DependencyInjection
     {
         services.AddScoped<IResponseFactory, ResponseFactory>();
 
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Application.DI.DependencyInjection).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
         return services;
     }
 }
