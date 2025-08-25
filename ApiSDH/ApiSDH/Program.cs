@@ -1,4 +1,3 @@
-using ApiSDH.Common.Services;
 using ApiSDH.DI;
 using ApiSDH.MIddleware;
 using Application.DI;
@@ -15,7 +14,7 @@ builder.Services.AddApplication();
 builder.Services.AddPresentation(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(); // required? 
 
 var app = builder.Build();
 
@@ -24,8 +23,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapHub<NotificationService>("/hubs/notifications");
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
