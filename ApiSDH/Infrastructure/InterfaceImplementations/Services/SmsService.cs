@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Services;
+using Microsoft.Extensions.Options;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -12,8 +13,11 @@ public class TwilioSettings
     public string FromSenderId { get; set; } = string.Empty;
 }
 
-public class SmsService(TwilioSettings settings) : ISmsService   // IOptions<TwilioSettings> options ,  _settings = options.Value;
+public class SmsService(IOptions<TwilioSettings> options)
+    : ISmsService // IOptions<TwilioSettings> options ,  _settings = options.Value;
 {
+    private readonly TwilioSettings settings = options.Value;
+
     public async Task
         SendSmsAsync(string phoneNumber,
             string message) // read number from db and hold in shared service to use for preformence.
