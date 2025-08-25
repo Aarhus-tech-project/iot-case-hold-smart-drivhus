@@ -8,6 +8,5 @@ public class SensorContext(DbContextOptions<SensorContext> options) : DbContext(
 {
     public DbSet<SensorReading> SensorReadings { get; set; }
 
-
     // model builder 
 }

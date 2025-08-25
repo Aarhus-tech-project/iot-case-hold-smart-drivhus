@@ -4,5 +4,5 @@ namespace Domain.Entities;
 
 public class SensorReading : BaseEntity
 {
-    // Data 
+    public float Humidity { get; set; }
 }

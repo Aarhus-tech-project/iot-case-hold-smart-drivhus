@@ -10,7 +10,7 @@ namespace ApiSDH.Controllers;
 public class SensorController(IMediator mediator, IResponseFactory responseFactory) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateSensorData([FromBody]CreateSensorReadingCommand command)
+    public async Task<IActionResult> CreateSensorData([FromBody] CreateSensorReadingCommand command)
     {
         var result = await mediator.Send(command);
         return responseFactory.CreateResponse(result);
