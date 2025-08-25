@@ -4,11 +4,16 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>784a269a-76a7-4682-90a2-77f9772aa313</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="MediatR" Version="13.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.19">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="MQTTnet" Version="5.0.1.1416"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>

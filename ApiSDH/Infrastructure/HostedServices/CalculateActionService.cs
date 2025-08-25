@@ -1,5 +1,4 @@
-﻿using Application.Common.Events;
-using Application.Common.Interfaces.Persistence;
+﻿using Application.Common.Interfaces.Persistence;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +16,7 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             // TODO calculate action
 
-            await mediator.Publish(new PreformActionEvent(Guid.NewGuid(), "parse data here"), stoppingToken);
+            //await mediator.Publish(new PreformActionEvent(Guid.NewGuid(), "parse data here"), stoppingToken);
             await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
         }
     }

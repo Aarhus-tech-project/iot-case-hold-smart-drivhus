@@ -10,7 +10,11 @@ public class SensorReadingFactory : ISensorReadingFactory
     {
         return new SensorReading
         {
-            Humidity = command.Humidity
+            Humidity = command.Humidity,
+            Temperature = command.Temperature,
+            Pressure = command.Pressure,
+            DirtHumidity = command.DirtHumidity,
+            LightLevel = command.LightLevel
         };
     }
 }

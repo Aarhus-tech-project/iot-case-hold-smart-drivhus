@@ -9,7 +9,12 @@ using MediatR;
 
 namespace Application.SensorReadings.Commands.Create;
 
-public record CreateSensorReadingCommand(float Humidity) : IRequest<Result<SensorReadingDto>>;
+public record CreateSensorReadingCommand(
+    float Humidity,
+    float Temperature,
+    float Pressure,
+    float DirtHumidity,
+    float LightLevel) : IRequest<Result<SensorReadingDto>>;
 
 public class CreateSensorReadingCommandHandler(
     ISensorContext sensorContext,
@@ -39,6 +44,10 @@ public class CreateSensorReadingCommandHandler(
         public CreateSensorReadingCommandValidator()
         {
             RuleFor(c => c.Humidity).NotEmpty();
+            RuleFor(c => c.Temperature).NotEmpty();
+            RuleFor(c => c.Pressure).NotEmpty();
+            RuleFor(c => c.DirtHumidity).NotEmpty();
+            RuleFor(c => c.LightLevel).NotEmpty();
         }
     }
 }

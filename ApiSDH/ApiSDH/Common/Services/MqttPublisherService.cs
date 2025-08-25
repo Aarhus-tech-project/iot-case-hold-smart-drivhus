@@ -20,9 +20,9 @@ public class MqttPublisherService : IMqttPublisherService
             .WithCleanSession()
             .Build();
 
-        _mqttClient.ConnectAsync(options, CancellationToken.None)
-            .GetAwaiter()
-            .GetResult();
+        // _mqttClient.ConnectAsync(options, CancellationToken.None)
+        //     .GetAwaiter()
+        //     .GetResult();
     }
 
     public async Task PublishAsync(Guid entityId, string data, CancellationToken cancellationToken = default)

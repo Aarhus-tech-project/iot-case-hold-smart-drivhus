@@ -15,7 +15,8 @@ public static class DependencyInjection
 
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssembly(typeof(Application.DI.DependencyInjection).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(Application.DI.DependencyInjection)
+                .Assembly); // May not be required anymore. No longer using IHub 
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
         });
 

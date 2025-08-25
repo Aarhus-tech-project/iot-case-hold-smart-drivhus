@@ -16,12 +16,19 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
 
 builder.Services.AddSignalR(); // required? 
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+        
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

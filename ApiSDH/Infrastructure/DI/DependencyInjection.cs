@@ -1,5 +1,6 @@
 ﻿using Infrastructure.DI.Extensions;
 using Infrastructure.HostedServices;
+using Infrastructure.InterfaceImplementations.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +20,8 @@ public static class DependencyInjection
         services.AddHostedService<CalculateActionService>();
 
         services.AddCustomSerilog(configuration, builder);
+
+        services.Configure<TwilioSettings>(configuration.GetSection("Twilio"));
 
         return services;
     }
