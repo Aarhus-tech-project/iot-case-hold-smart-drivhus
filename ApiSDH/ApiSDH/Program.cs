@@ -13,8 +13,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 builder.Services.AddApplication();
-builder.Services.AddPresentation(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
+builder.Services.AddPresentation(builder.Configuration);
 
 builder.Services.AddSignalR(); // required? 
 
