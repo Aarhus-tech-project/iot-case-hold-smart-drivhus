@@ -4,5 +4,5 @@ namespace Domain.Entities;
 
 public class UserInfo : BaseEntity
 {
-    public int PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = "+4555555555";
 }

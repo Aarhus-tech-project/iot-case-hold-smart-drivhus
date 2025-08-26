@@ -17,8 +17,8 @@ public class SensorController(IMediator mediator, IResponseFactory responseFacto
         return responseFactory.CreateResponse(result);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetSensorData() // Måske ikke fra route eftersom at der ikke kommer noget 
+    [HttpGet("~/api/sensors")]
+    public async Task<IActionResult> GetSensorData()
     {
         var result = await mediator.Send(new GetSensorReadingsQuery());
         return responseFactory.CreateResponse(result);
