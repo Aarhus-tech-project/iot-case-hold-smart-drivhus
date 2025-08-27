@@ -10,6 +10,7 @@
     <ItemGroup>
         <PackageReference Include="MediatR" Version="13.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19"/>
+        <PackageReference Include="Microsoft.Azure.Devices" Version="1.40.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.19">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

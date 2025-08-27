@@ -11,7 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IResponseFactory, ResponseFactory>();
 
-        services.AddSingleton<IMqttPublisherService, MqttPublisherService>();
+        services.AddSingleton<IIoTHubPublisherService, IoTHubPublisherService>();
 
         services.AddMediatR(cfg =>
         {

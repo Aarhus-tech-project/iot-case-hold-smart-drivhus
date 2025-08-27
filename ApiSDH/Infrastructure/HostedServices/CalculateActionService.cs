@@ -16,6 +16,8 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             // TODO calculate action
 
+            // publish stuff to iot hub if an action should be taken 
+
             //await mediator.Publish(new PreformActionEvent(Guid.NewGuid(), "parse data here"), stoppingToken);
             await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
         }

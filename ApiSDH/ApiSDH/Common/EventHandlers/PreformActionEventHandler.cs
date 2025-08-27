@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ApiSDH.Common.EventHandlers;
 
-public class PreformActionEventHandler(IMqttPublisherService mqttPublisher)
+public class PreformActionEventHandler(IIoTHubPublisherService ioTHubPublisherService)
     : INotificationHandler<PreformActionEvent>
 {
     public async Task Handle(PreformActionEvent notification, CancellationToken cancellationToken)
@@ -12,6 +12,6 @@ public class PreformActionEventHandler(IMqttPublisherService mqttPublisher)
         //await hub.Clients.All.ReceiveAnalysis(notification.EntityId, notification.Data);
 
         // MQTT publish
-        await mqttPublisher.PublishAsync(notification.EntityId, notification.Data, cancellationToken);
+        await ioTHubPublisherService.PublishAsync(notification.Data, cancellationToken);
     }
 }
