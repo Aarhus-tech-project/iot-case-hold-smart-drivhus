@@ -31,7 +31,7 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
-    UserEnforcementService.EnsureSingleUser(db);
+    UserEnforcementService.EnsureSingleUser(db); // Move to infrastructure 
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
