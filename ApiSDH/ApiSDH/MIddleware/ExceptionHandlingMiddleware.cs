@@ -1,12 +1,14 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Application.Common.Interfaces.Services;
 
 namespace ApiSDH.MIddleware;
 
 public class ExceptionHandlingMiddleware(
     RequestDelegate next,
     ILogger<ExceptionHandlingMiddleware> logger,
-    IWebHostEnvironment env)
+    IWebHostEnvironment env,
+    ISmsService smsService,
+    IConfiguration config)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -18,7 +20,13 @@ public class ExceptionHandlingMiddleware(
         {
             logger.LogError(ex, ex.Message);
 
-            if (Debugger.IsAttached) throw;
+            var notifyAdmin = config.GetValue<bool>("SmsLogger:Enabled");
+            if (notifyAdmin)
+            {
+                var number = config.GetValue<string>("SmsLogger:Number");
+                // if valid number 
+                await smsService.SendSmsAsync(number, "App error");
+            }
 
             await HandleExceptionAsync(context, ex);
         }

@@ -22,6 +22,8 @@ if (builder.Environment.IsDevelopment()) builder.Configuration.AddUserSecrets<Pr
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -34,7 +36,6 @@ using (var scope = app.Services.CreateScope())
     UserEnforcementService.EnsureSingleUser(db); // Move to infrastructure 
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseHttpsRedirection();
 app.Run();
