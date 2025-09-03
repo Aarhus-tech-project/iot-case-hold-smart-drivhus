@@ -1,5 +1,4 @@
-﻿using Application.Common.Events;
-using Application.Common.Interfaces.Persistence;
+﻿using Application.Common.Interfaces.Persistence;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +18,7 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             // publish stuff to iot hub if an action should be taken 
 
-            await mediator.Publish(new PreformActionEvent("parse data here"), stoppingToken);
+            //await mediator.Publish(new PreformActionEvent("parse data here"), stoppingToken);
             await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
         }
     }

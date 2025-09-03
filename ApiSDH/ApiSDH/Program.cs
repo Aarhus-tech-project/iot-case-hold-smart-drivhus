@@ -12,13 +12,14 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
+//if (builder.Environment.IsDevelopment()) builder.Configuration.AddUserSecrets<Program>();
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
 builder.Services.AddPresentation(builder.Configuration);
 
 builder.Services.AddSignalR(); // required? 
 
-if (builder.Environment.IsDevelopment()) builder.Configuration.AddUserSecrets<Program>();
 
 var app = builder.Build();
 
@@ -38,4 +39,5 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 app.UseHttpsRedirection();
+app.MapControllers();
 app.Run();

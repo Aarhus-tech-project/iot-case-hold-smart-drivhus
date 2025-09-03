@@ -14,14 +14,14 @@ public static class DependencyInjection
     {
         services.AddDatabase(configuration);
 
+        services.Configure<TwilioSettings>(configuration.GetSection("Twilio"));
+
         services.AddInterfaceImplementations();
 
         // move out at somepoint 
         services.AddHostedService<CalculateActionService>();
 
         services.AddCustomSerilog(configuration, builder);
-
-        services.Configure<TwilioSettings>(configuration.GetSection("Twilio"));
 
         return services;
     }

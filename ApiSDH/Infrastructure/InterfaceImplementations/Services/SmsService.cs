@@ -14,7 +14,7 @@ public class TwilioSettings
 }
 
 public class SmsService(IOptions<TwilioSettings> options)
-    : ISmsService // IOptions<TwilioSettings> options ,  _settings = options.Value;
+    : ISmsService // IOptions<TwilioSettings> options ,  _settings = options.Value; 
 {
     private readonly TwilioSettings settings = options.Value;
 
@@ -29,5 +29,5 @@ public class SmsService(IOptions<TwilioSettings> options)
             from: settings.FromSenderId,
             body: $"{message}"
         );
-    }
+    }   
 }

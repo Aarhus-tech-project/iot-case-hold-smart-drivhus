@@ -10,7 +10,7 @@ public static class DatabaseExtensions
 {
     internal static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("AzureConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<SensorContext>((provider, options) => { options.UseSqlServer(connectionString); });
 

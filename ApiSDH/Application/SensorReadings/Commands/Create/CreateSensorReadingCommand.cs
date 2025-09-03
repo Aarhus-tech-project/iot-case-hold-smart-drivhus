@@ -27,6 +27,8 @@ public class CreateSensorReadingCommandHandler(
     public async Task<Result<SensorReadingDto>> Handle(CreateSensorReadingCommand request,
         CancellationToken cancellationToken)
     {
+        throw new InvalidOperationException();
+
         var isValid = await validator.ValidateAsync(request, cancellationToken);
 
         if (!isValid.IsValid) return resultFactory.BadRequest<SensorReadingDto>();

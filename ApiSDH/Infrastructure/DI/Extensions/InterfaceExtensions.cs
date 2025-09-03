@@ -14,7 +14,7 @@ public static class InterfaceExtensions
     {
         services.AddScoped<IResultFactory, ResultFactory>();
         services.AddScoped<ISensorReadingFactory, SensorReadingFactory>();
-        services.AddScoped<ISmsService, SmsService>();
+        services.AddTransient<ISmsService, SmsService>();
 
         return services;
     }
