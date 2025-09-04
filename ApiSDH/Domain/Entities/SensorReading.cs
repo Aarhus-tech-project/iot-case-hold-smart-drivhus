@@ -4,12 +4,14 @@ namespace Domain.Entities;
 
 public class SensorReading : BaseEntity
 {
-    public float Humidity { get; set; }
-    public float Temperature { get; set; }
-    public float Pressure { get; set; }
+    public string Humidity { get; set; }
+    public string Temperature { get; set; }
+    public string Pressure { get; set; }
 
 
-    public float DirtHumidity { get; set; }
+    public string DirtHumidity { get; set; }
 
-    public float LightLevel { get; set; }
+    public string LightLevel { get; set; }
+
+    public int WaterLimit { get; set; }
 }

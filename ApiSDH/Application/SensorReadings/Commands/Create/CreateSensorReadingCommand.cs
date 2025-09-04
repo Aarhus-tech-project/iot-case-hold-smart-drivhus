@@ -10,11 +10,14 @@ using MediatR;
 namespace Application.SensorReadings.Commands.Create;
 
 public record CreateSensorReadingCommand(
-    float Humidity,
-    float Temperature,
-    float Pressure,
-    float DirtHumidity,
-    float LightLevel) : IRequest<Result<SensorReadingDto>>;
+    string Humidity,
+    string Temperature,
+    string Pressure,
+    string DirtHumidity,
+    string LightLevel,
+    string WaterHeight,
+    string Co2
+) : IRequest<Result<SensorReadingDto>>;
 
 public class CreateSensorReadingCommandHandler(
     ISensorContext sensorContext,
