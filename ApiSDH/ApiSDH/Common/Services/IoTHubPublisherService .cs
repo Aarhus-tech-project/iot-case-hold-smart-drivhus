@@ -11,8 +11,9 @@ public class IoTHubPublisherService : IIoTHubPublisherService
 
     public IoTHubPublisherService(IConfiguration config)
     {
-        var connectionString = config["IoTHubConnectionString"];
-        _targetDeviceId = config["IoTHubDeviceId"]
+        var connectionString = config["Azure:IotConString"];
+
+        _targetDeviceId = config["Azure:DeviceId"]
                           ?? throw new InvalidOperationException("IoTHubDeviceId is missing from configuration");
 
         if (string.IsNullOrWhiteSpace(connectionString))

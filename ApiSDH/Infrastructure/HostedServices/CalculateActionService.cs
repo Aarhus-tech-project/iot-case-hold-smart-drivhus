@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Persistence;
+﻿using Application.Common.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
 using Domain.Entities;
 using MediatR;
@@ -53,13 +54,10 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
                     await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
                     latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
                 }
-            
-            
-            
 
-
-            //await mediator.Publish(new PreformActionEvent("parse data here"), stoppingToken);
+            await mediator.Publish(new PreformActionEvent("parse data here"), cancellationToken);
             end: ;
+
             await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
         }
     }

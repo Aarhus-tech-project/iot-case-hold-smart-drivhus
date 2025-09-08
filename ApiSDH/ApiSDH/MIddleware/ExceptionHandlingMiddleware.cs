@@ -24,7 +24,6 @@ public class ExceptionHandlingMiddleware(
             if (notifyAdmin)
             {
                 var number = config.GetValue<string>("SmsLogger:Number");
-                // if valid number 
                 await smsService.SendSmsAsync(number, "App error");
             }
 

@@ -29,5 +29,5 @@ public class SmsService(IOptions<TwilioSettings> options)
             from: settings.FromSenderId,
             body: $"{message}"
         );
-    }   
+    }
 }
