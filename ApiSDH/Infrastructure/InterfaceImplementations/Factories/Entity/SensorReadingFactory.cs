@@ -1,20 +1,22 @@
-﻿using Application.Common.Interfaces.Factories.Entity;
-using Application.SensorReadings.Commands.Create;
-using Domain.Entities;
+﻿    using Application.Common.Interfaces.Factories.Entity;
+    using Application.SensorReadings.Commands.Create;
+    using Domain.Entities;
 
-namespace Infrastructure.InterfaceImplementations.Factories.Entity;
+    namespace Infrastructure.InterfaceImplementations.Factories.Entity;
 
-public class SensorReadingFactory : ISensorReadingFactory
-{
-    public SensorReading Create(CreateSensorReadingCommand command)
+    public class SensorReadingFactory : ISensorReadingFactory
     {
-        return new SensorReading
+        public SensorReading Create(CreateSensorReadingCommand command)
         {
-            Humidity = command.Humidity,
-            Temperature = command.Temperature,
-            Pressure = command.Pressure,
-            DirtHumidity = command.DirtHumidity,
-            LightLevel = command.LightLevel
-        };
+            return new SensorReading
+            {
+                Lux = command.lux,
+                SoilHumidity = command.soilhumidity,
+                Temp = command.temp,
+                Pressure = command.pressure,
+                Humidity = command.humidity,
+                Co2 = command.co2,
+                WaterLevel = command.waterlevel
+            };
+        }
     }
-}

@@ -6,14 +6,17 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Twilio.Rest.Wireless.V1;
 
 namespace Infrastructure.HostedServices;
 
 public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator mediator, ISmsService smsService)
     : BackgroundService
 {
-    private DateTimeOffset? latestDataSetLowSmsDate;
-    private DateTimeOffset? latestWaterTankLowSmsDate;
+    private DateTimeOffset latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
+    private DateTimeOffset latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+    private DateTimeOffset latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
+    private DateTimeOffset latestCo2Check = DateTimeOffset.UtcNow;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -34,10 +37,9 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             var dataSet = await db.SensorReadings.OrderBy(sr => sr.CreatedAt).Take(20).ToListAsync(cancellationToken);
 
-            if (dataSet.Count is 0)
+            if (dataSet.Count < 6)
             {
-                if (!latestDataSetLowSmsDate.HasValue ||
-                    DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(15))
+                if (DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(15))
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber,
                         "Dataset is low on data, api can not calculate action yet.");
@@ -46,16 +48,40 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
                 goto end;
             }
-
+    
+            
+            // chain water check and water plant 
             if (CheckWater(user, dataSet))
-                if (!latestWaterTankLowSmsDate.HasValue ||
-                    DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(15))
+                if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(15))
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
                     latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
                 }
 
-            await mediator.Publish(new PreformActionEvent("parse data here"), cancellationToken);
+            if (CheckSoilMoisture(user, dataSet))
+                if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(15))
+                {
+                    await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
+                    await smsService.SendSmsAsync(user.PhoneNumber, "Soil Moisture low, watering plant.");
+                    latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                }
+
+
+            if (CheckCo2(user, dataSet))
+            {
+                if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(15))
+                {
+                    await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft 
+                    await smsService.SendSmsAsync(user.PhoneNumber, "Co2 low, opening window.");
+                    latestCo2Check = DateTimeOffset.UtcNow;
+                }
+            }
+            
+            // check light level 
+            
+            
+            
+            //await mediator.Publish(new PreformActionEvent("parse data here"), cancellationToken);
             end: ;
 
             await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
@@ -63,9 +89,28 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
     }
 
 
+    // check if water tank is in need of more water 
     public bool CheckWater(UserInfo user, List<SensorReading> dataSet)
     {
-        if (user.WaterLimit >= dataSet.Average(sr => sr.WaterLimit)) return true;
+        if (user.WaterLimit >= dataSet.Average(sr => sr.WaterLevel)) return true;
         return false;
+    }
+
+    // Check if we need to water plant
+    public bool CheckSoilMoisture(UserInfo user, List<SensorReading> dataSet)
+    {
+        if (user.SoilMoistureLimit >= dataSet.Average(sr => sr.SoilHumidity)) return true;
+        return false;
+    }
+
+    public bool CheckCo2(UserInfo user, List<SensorReading> dataSet)
+    {
+        if(user.Co2Limit >= dataSet.Average(sr=>sr.Co2)) return true;
+        return false;
+    }
+
+    public bool CheckLightLevel(UserInfo user, List<SensorReading> dataSet)
+    {
+        return true; // send sms med at der er for meget skygge, slå fra om natten 
     }
 }
