@@ -50,23 +50,29 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
             }
 
 
-            // chain water check and water plant 
+            // chain water and send sms if tank is low 
             if (CheckWater(user, dataSet))
+            {
                 if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(15))
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
                     latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
                 }
-
-            if (CheckSoilMoisture(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(15))
+            }
+            else
+            {
+                if (CheckSoilMoisture(user, dataSet)) // check if the plant required new water, only if the tank has water
                 {
-                    await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
-                    await smsService.SendSmsAsync(user.PhoneNumber, "Soil Moisture low, watering plant.");
-                    latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                    if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(15))
+                    {
+                        await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
+                        await smsService.SendSmsAsync(user.PhoneNumber, "Soil Moisture low, watering plant.");
+                        latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                    }
                 }
+            }
 
-
+            // check co2, open windown for fresh air 
             if (CheckCo2(user, dataSet))
                 if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(15))
                 {
