@@ -6,17 +6,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Twilio.Rest.Wireless.V1;
 
 namespace Infrastructure.HostedServices;
 
 public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator mediator, ISmsService smsService)
     : BackgroundService
 {
+    private DateTimeOffset latestCo2Check = DateTimeOffset.UtcNow;
     private DateTimeOffset latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
     private DateTimeOffset latestSoildMoistureCheck = DateTimeOffset.UtcNow;
     private DateTimeOffset latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
-    private DateTimeOffset latestCo2Check = DateTimeOffset.UtcNow;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -35,7 +34,8 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             // Dobble check at det er sorteret korrekt 
 
-            var dataSet = await db.SensorReadings.OrderBy(sr => sr.CreatedAt).Take(20).ToListAsync(cancellationToken);
+            var dataSet = await db.SensorReadings.OrderByDescending(sr => sr.CreatedAt).Take(20)
+                .ToListAsync(cancellationToken);
 
             if (dataSet.Count < 6)
             {
@@ -48,8 +48,8 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
                 goto end;
             }
-    
-            
+
+
             // chain water check and water plant 
             if (CheckWater(user, dataSet))
                 if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(15))
@@ -68,22 +68,20 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
 
             if (CheckCo2(user, dataSet))
-            {
                 if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(15))
                 {
                     await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft 
                     await smsService.SendSmsAsync(user.PhoneNumber, "Co2 low, opening window.");
                     latestCo2Check = DateTimeOffset.UtcNow;
                 }
-            }
-            
+
             // check light level 
-            
-            
-            
+
+
             //await mediator.Publish(new PreformActionEvent("parse data here"), cancellationToken);
             end: ;
 
+            // add startup sms, shows the app did susscessfuly launch and run this service, 
             await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
         }
     }
@@ -105,7 +103,7 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
     public bool CheckCo2(UserInfo user, List<SensorReading> dataSet)
     {
-        if(user.Co2Limit >= dataSet.Average(sr=>sr.Co2)) return true;
+        if (user.Co2Limit >= dataSet.Average(sr => sr.Co2)) return true;
         return false;
     }
 
