@@ -9,7 +9,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.HostedServices;
 
-public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator mediator, ISmsService smsService)
+public class CalculateActionService(
+    IServiceScopeFactory scopeFactory,
+    IMediator mediator,
+    ISmsService smsService,
+    IStatusService statusService)
     : BackgroundService
 {
     private DateTimeOffset latestCo2Check = DateTimeOffset.UtcNow;
@@ -19,6 +23,8 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        statusService.Write("Status: CalculateActionService started");
+
         while (!cancellationToken.IsCancellationRequested)
         {
             using var scope = scopeFactory.CreateScope();
@@ -39,11 +45,12 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
 
             if (dataSet.Count < 6)
             {
-                if (DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(15))
+                if (DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(20))
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber,
                         "Dataset is low on data, api can not calculate action yet.");
                     latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
+                    statusService.Write("Sending sms: Dataset is low on data, api can not calculate action yet.");
                 }
 
                 goto end;
@@ -53,32 +60,32 @@ public class CalculateActionService(IServiceScopeFactory scopeFactory, IMediator
             // chain water and send sms if tank is low 
             if (CheckWater(user, dataSet))
             {
-                if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(15))
+                if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(20))
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
                     latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
+                    statusService.Write("Sending sms: Water level is low, please refill water tank.");
                 }
             }
             else
             {
-                if (CheckSoilMoisture(user, dataSet)) // check if the plant required new water, only if the tank has water
-                {
-                    if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(15))
+                if (CheckSoilMoisture(user,
+                        dataSet)) // check if the plant required new water, only if the tank has water
+                    if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(20))
                     {
                         await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
-                        await smsService.SendSmsAsync(user.PhoneNumber, "Soil Moisture low, watering plant.");
                         latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                        statusService.Write("Status: Event: Soil Moisture low.");
                     }
-                }
             }
 
             // check co2, open windown for fresh air 
             if (CheckCo2(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(15))
+                if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(20))
                 {
                     await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft 
-                    await smsService.SendSmsAsync(user.PhoneNumber, "Co2 low, opening window.");
                     latestCo2Check = DateTimeOffset.UtcNow;
+                    statusService.Write("Status: Event: Co2 low.");
                 }
 
             // check light level 

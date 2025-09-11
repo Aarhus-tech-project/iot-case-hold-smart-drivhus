@@ -11,12 +11,12 @@ namespace Application.SensorReadings.Commands.Create;
 
 public record CreateSensorReadingCommand(
     int lux,
-    int soilhumidity,
+    int soil,
     int temp,
     int pressure,
     int humidity,
     int co2,
-    int waterlevel
+    int water
 ) : IRequest<Result<SensorReadingDto>>;
 
 public class CreateSensorReadingCommandHandler(
@@ -46,13 +46,13 @@ public class CreateSensorReadingCommandHandler(
     {
         public CreateSensorReadingCommandValidator()
         {
-            RuleFor(c => c.lux).NotEmpty();
-            RuleFor(c => c.soilhumidity).NotEmpty();
-            RuleFor(c => c.temp).NotEmpty();
-            RuleFor(c => c.pressure).NotEmpty();
-            RuleFor(c => c.humidity).NotEmpty();
-            RuleFor(c => c.co2).NotEmpty();
-            RuleFor(c => c.waterlevel).NotEmpty();
+            RuleFor(c => c.lux).NotNull();
+            RuleFor(c => c.soil).NotNull();
+            RuleFor(c => c.temp).NotNull();
+            RuleFor(c => c.pressure).NotNull();
+            RuleFor(c => c.humidity).NotNull();
+            RuleFor(c => c.co2).NotNull();
+            RuleFor(c => c.water).NotNull();
         }
     }
 }

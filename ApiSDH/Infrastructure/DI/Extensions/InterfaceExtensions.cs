@@ -14,7 +14,11 @@ public static class InterfaceExtensions
     {
         services.AddScoped<IResultFactory, ResultFactory>();
         services.AddScoped<ISensorReadingFactory, SensorReadingFactory>();
-        services.AddTransient<ISmsService, SmsService>();
+
+        services
+            .AddTransient<ISmsService,
+                SmsService>(); // Would perfer scoped but as this is used inside hosted service it obvi can not be scoped. 
+        services.AddTransient<IStatusService, StatusService>();
 
         return services;
     }
