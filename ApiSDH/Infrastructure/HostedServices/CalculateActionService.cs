@@ -30,8 +30,7 @@ public class CalculateActionService(
             using var scope = scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
 
-            // TODO calculate action
-
+            // Todo Move usage of status service into mqtt publisher and sms service
 
             var user = await db.Users.FirstOrDefaultAsync(cancellationToken);
 
@@ -50,7 +49,6 @@ public class CalculateActionService(
                     await smsService.SendSmsAsync(user.PhoneNumber,
                         "Dataset is low on data, api can not calculate action yet.");
                     latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
-                    statusService.Write("Sending sms: Dataset is low on data, api can not calculate action yet.");
                 }
 
                 goto end;
@@ -64,7 +62,6 @@ public class CalculateActionService(
                 {
                     await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
                     latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
-                    statusService.Write("Sending sms: Water level is low, please refill water tank.");
                 }
             }
             else
@@ -75,7 +72,6 @@ public class CalculateActionService(
                     {
                         await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
                         latestSoildMoistureCheck = DateTimeOffset.UtcNow;
-                        statusService.Write("Status: Event: Soil Moisture low.");
                     }
             }
 
@@ -85,7 +81,6 @@ public class CalculateActionService(
                 {
                     await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft 
                     latestCo2Check = DateTimeOffset.UtcNow;
-                    statusService.Write("Status: Event: Co2 low.");
                 }
 
             // check light level 

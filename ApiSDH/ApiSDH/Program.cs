@@ -31,15 +31,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Ensure there is exactly 1 user in the system.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
-    UserEnforcementService.EnsureSingleUser(db); // Move to infrastructure 
+    UserEnforcementService.EnsureSingleUser(db);
 }
 
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
-
-
-// app må ikke starter vand pumpe hvis tanken er tom 

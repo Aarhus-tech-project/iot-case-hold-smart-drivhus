@@ -1,6 +1,6 @@
-﻿using Infrastructure.DI.Extensions;
+﻿using Infrastructure.Common.Services;
+using Infrastructure.DI.Extensions;
 using Infrastructure.HostedServices;
-using Infrastructure.InterfaceImplementations.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
