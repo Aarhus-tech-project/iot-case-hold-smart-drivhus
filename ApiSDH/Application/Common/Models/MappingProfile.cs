@@ -10,6 +10,6 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<SensorReading, SensorReadingDto>();
-        CreateMap<UserInfo, UserDto>();
+        CreateMap<Config, ConfigDto>();
     }
 }

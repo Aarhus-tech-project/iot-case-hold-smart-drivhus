@@ -6,7 +6,7 @@ namespace Application.Common.Interfaces.Persistence;
 public interface ISensorContext
 {
     DbSet<SensorReading> SensorReadings { get; }
-    DbSet<UserInfo> Users { get; }
+    DbSet<Config> Configs { get; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

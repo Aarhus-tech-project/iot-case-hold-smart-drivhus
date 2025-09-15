@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces.Factories;
+﻿/*using Application.Common.Interfaces.Factories;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models;
 using Application.Users.Dtos;
@@ -18,7 +18,7 @@ public class UpdatePhoneNumberQueryHandler(ISensorContext sensorContext, IResult
         var user = await sensorContext.Users.AsTracking().FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
-            // server fejl, der skal værer 1 user. 
+            // server fejl, der skal værer 1 user.
             throw new InvalidOperationException();
 
         user.PhoneNumber = request.PhoneNumber;
@@ -26,4 +26,5 @@ public class UpdatePhoneNumberQueryHandler(ISensorContext sensorContext, IResult
         await sensorContext.SaveChangesAsync(cancellationToken);
         return resultFactory.Ok(mapper.Map<UserDto>(user));
     }
-}
+}*/
+

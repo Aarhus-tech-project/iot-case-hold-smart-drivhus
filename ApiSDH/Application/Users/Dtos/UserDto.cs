@@ -1,6 +1,6 @@
 ﻿namespace Application.Users.Dtos;
 
-public class UserDto
+public class ConfigDto
 {
     public string PhoneNumber { get; set; }
 

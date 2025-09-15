@@ -12,14 +12,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-//if (builder.Environment.IsDevelopment()) builder.Configuration.AddUserSecrets<Program>();
-
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
 builder.Services.AddPresentation(builder.Configuration);
 
-builder.Services.AddSignalR(); // required? 
-
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -35,7 +32,7 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
-    UserEnforcementService.EnsureSingleUser(db);
+    ConfigEnforcementService.EnsureSingleConfig(db);
 }
 
 app.UseHttpsRedirection();

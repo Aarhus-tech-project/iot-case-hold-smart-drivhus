@@ -3,15 +3,15 @@ using Domain.Entities;
 
 namespace ApiSDH.Common.Services;
 
-public static class UserEnforcementService
+public static class ConfigEnforcementService
 {
-    public static void EnsureSingleUser(ISensorContext context)
+    public static void EnsureSingleConfig(ISensorContext context)
     {
-        var users = context.Users.ToList();
+        var users = context.Configs.ToList();
 
         if (users.Count == 0)
         {
-            context.Users.Add(new UserInfo());
+            context.Configs.Add(new Config());
             context.SaveChanges();
         }
         else if (users.Count > 1)

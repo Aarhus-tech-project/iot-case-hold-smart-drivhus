@@ -7,7 +7,7 @@ namespace Infrastructure.Persistence;
 public class SensorContext(DbContextOptions<SensorContext> options) : DbContext(options), ISensorContext // interface 
 {
     public DbSet<SensorReading> SensorReadings { get; set; }
-    public DbSet<UserInfo> Users { get; set; }
+    public DbSet<Config> Configs { get; set; }
 
     // model builder 
 }
