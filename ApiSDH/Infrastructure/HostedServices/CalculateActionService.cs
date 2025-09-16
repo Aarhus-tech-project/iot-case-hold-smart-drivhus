@@ -1,5 +1,4 @@
-﻿using Application.Common.Events;
-using Application.Common.Interfaces.Services;
+﻿using Application.Common.Interfaces.Services;
 using Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -112,13 +111,13 @@ public class CalculateActionService(
             // Todo: Add way to close window again lol.
 */
 
-            await mediator.Publish(new PreformActionEvent("Event: Open window."));
-
-            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
-
-            await mediator.Publish(new PreformActionEvent("Event: Close window."));
-
-            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            // await mediator.Publish(new PreformActionEvent("Event: Open window."));
+            //
+            // await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            //
+            // await mediator.Publish(new PreformActionEvent("Event: Close window."));
+            //
+            // await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
 
             // add startup sms, shows the app did susscessfuly launch and run this service, 
             //  await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);

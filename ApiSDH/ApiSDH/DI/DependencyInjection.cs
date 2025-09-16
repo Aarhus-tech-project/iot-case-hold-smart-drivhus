@@ -2,6 +2,8 @@
 using ApiSDH.Common.Interfaces.Services;
 using ApiSDH.Common.Services;
 using ApiSDH.Common.Services.Factories;
+using Application.Common.Behaviors;
+using MediatR;
 
 namespace ApiSDH.DI;
 
@@ -19,6 +21,9 @@ public static class DependencyInjection
                 .Assembly); // May not be required anymore. No longer using IHub 
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
         });
+
+        // Would register in application bt must come after medatR 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CommandLifecycleBehavior<,>));
 
         return services;
     }

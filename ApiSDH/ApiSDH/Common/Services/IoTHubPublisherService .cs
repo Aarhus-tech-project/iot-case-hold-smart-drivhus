@@ -25,7 +25,11 @@ public class IoTHubPublisherService : IIoTHubPublisherService
     public async Task PublishAsync(string data, CancellationToken cancellationToken = default)
     {
         var payload = $"Entity: Data: {data}";
-        var message = new Message(Encoding.UTF8.GetBytes(payload));
+
+        var message = new Message(Encoding.UTF8.GetBytes(payload))
+        {
+            ExpiryTimeUtc = DateTime.UtcNow.AddMinutes(5) // auto-drop after 5 minutes
+        };
 
         await _serviceClient.SendAsync(_targetDeviceId, message);
     }
