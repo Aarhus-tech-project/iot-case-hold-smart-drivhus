@@ -1,13 +1,13 @@
 using Application.Common.Interfaces.Factories;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models;
-using Application.Users.Dtos;
+using Application.Configs.Dtos;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Users.Commands.Update;
+namespace Application.Configs.Commands.Update;
 
 public record UpdateConfigCommand(
     string phoneNumber,

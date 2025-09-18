@@ -1,5 +1,5 @@
-﻿using Application.SensorReadings.Dtos;
-using Application.Users.Dtos;
+﻿using Application.Configs.Dtos;
+using Application.SensorReadings.Dtos;
 using AutoMapper;
 using Domain.Entities;
 

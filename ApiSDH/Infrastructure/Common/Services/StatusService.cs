@@ -5,7 +5,7 @@ namespace Infrastructure.Common.Services;
 
 public class StatusService : IStatusService
 {
-    private static string StatusFolder; // Why static 
+    private static string StatusFolder;
 
     public StatusService(IConfiguration configuration)
     {

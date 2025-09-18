@@ -1,14 +1,19 @@
-﻿using Application.Common.Interfaces.Services;
+﻿using Application.Common.Events;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Services;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.HostedServices;
 
 public class CalculateActionService(
     IServiceScopeFactory scopeFactory,
     IMediator mediator,
+    ILogger<CalculateActionService> logger,
     ISmsService smsService,
     IStatusService statusService)
     : BackgroundService
@@ -23,104 +28,96 @@ public class CalculateActionService(
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        statusService.Write("Status: CalculateActionService started");
-
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            /*
-            using var scope = scopeFactory.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
+            statusService.Write("Status: CalculateActionService started");
 
-            // Todo Move usage of status service into mqtt publisher and sms service
-
-            var user = await db.Users.FirstOrDefaultAsync(cancellationToken);
-
-            if (user is null) // throws app error, user inforcer burde have kørt
-                throw new InvalidOperationException();
-
-            // Dobble check at det er sorteret korrekt
-
-            var dataSet = await db.SensorReadings.OrderByDescending(sr => sr.CreatedAt).Take(20)
-                .ToListAsync(cancellationToken);
-
-            if (dataSet.Count < 6)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                if (DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(20))
+                using var scope = scopeFactory.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ISensorContext>();
+
+                var config = await db.Configs.FirstOrDefaultAsync(cancellationToken);
+
+                if (config is null) throw new InvalidOperationException();
+
+                var dataSet = await db.SensorReadings.OrderByDescending(sr => sr.CreatedAt).Take(20)
+                    .ToListAsync(cancellationToken);
+
+                if (dataSet.Count < 20)
                 {
-                    await smsService.SendSmsAsync(user.PhoneNumber,
-                        "Dataset is low on data, api can not calculate action yet.");
-                    latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
-                }
-
-                goto end;
-            }
-
-
-            // chain water and send sms if tank is low
-            if (CheckWater(user, dataSet))
-            {
-                if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(20))
-                {
-                    await smsService.SendSmsAsync(user.PhoneNumber, "Water level is low, please refill water tank.");
-                    latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
-                }
-            }
-            else
-            {
-                if (CheckSoilMoisture(user,
-                        dataSet)) // check if the plant required new water, only if the tank has water
-                    if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(20))
+                    if (DateTimeOffset.UtcNow - latestDataSetLowSmsDate > TimeSpan.FromMinutes(20))
                     {
-                        await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."), cancellationToken);
-                        latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                        await smsService.SendSmsAsync(config.PhoneNumber,
+                            "Dataset is low on data, api can not calculate action yet.");
+                        latestDataSetLowSmsDate = DateTimeOffset.UtcNow;
                     }
+
+                    goto end;
+                }
+
+                // chain water and send sms if tank is low
+                if (CheckWater(config, dataSet))
+                {
+                    if (DateTimeOffset.UtcNow - latestWaterTankLowSmsDate > TimeSpan.FromMinutes(20))
+                    {
+                        await smsService.SendSmsAsync(config.PhoneNumber,
+                            "Water level is low, please refill water tank.");
+                        latestWaterTankLowSmsDate = DateTimeOffset.UtcNow;
+                    }
+                }
+                else
+                {
+                    if (CheckSoilMoisture(config,
+                            dataSet)) // check if the plant required new water, only if the tank has water
+                        if (DateTimeOffset.UtcNow - latestSoildMoistureCheck > TimeSpan.FromMinutes(20))
+                        {
+                            await mediator.Publish(new PreformActionEvent("Event: Soil Moisture low."),
+                                cancellationToken);
+                            latestSoildMoistureCheck = DateTimeOffset.UtcNow;
+                        }
+                }
+
+                // check co2, open windown for fresh air
+                if (CheckCo2(config, dataSet))
+                    if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(20))
+                    {
+                        await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft
+                        latestCo2Check = DateTimeOffset.UtcNow;
+                    }
+
+                if (CheckTemp(config, dataSet))
+                    if (DateTimeOffset.UtcNow - latestTempCheck > TimeSpan.FromMinutes(20))
+                    {
+                        await mediator.Publish(new PreformActionEvent("Event: Temp too high."), cancellationToken);
+                        latestTempCheck = DateTimeOffset.UtcNow;
+                    }
+
+
+                if (CheckHumi(config, dataSet))
+                    if (DateTimeOffset.UtcNow - latestHumiCheck > TimeSpan.FromMinutes(20))
+                    {
+                        await mediator.Publish(new PreformActionEvent("Event: Humi too high."), cancellationToken);
+                        latestHumiCheck = DateTimeOffset.UtcNow;
+                    }
+
+
+                if (CheckLightLevel(config, dataSet))
+                    if (DateTimeOffset.UtcNow - latestLightCheck > TimeSpan.FromMinutes(20))
+                    {
+                        await smsService.SendSmsAsync(config.PhoneNumber, "Light level in green ouse is low.");
+                        latestLightCheck = DateTimeOffset.UtcNow;
+                    }
+
+                end: ;
+                // Todo: Add way to close window again lol.
+
+                await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
             }
-
-            // check co2, open windown for fresh air
-            if (CheckCo2(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestCo2Check > TimeSpan.FromMinutes(20))
-                {
-                    await mediator.Publish(new PreformActionEvent("Event: Co2 low."), cancellationToken); // udluft
-                    latestCo2Check = DateTimeOffset.UtcNow;
-                }
-
-            if (CheckTemp(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestTempCheck > TimeSpan.FromMinutes(20))
-                {
-                    await mediator.Publish(new PreformActionEvent("Event: Temp low."), cancellationToken);
-                    latestTempCheck = DateTimeOffset.UtcNow;
-                }
-
-
-            if (CheckHumi(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestHumiCheck > TimeSpan.FromMinutes(20))
-                {
-                    await mediator.Publish(new PreformActionEvent("Event: Humi low."), cancellationToken);
-                    latestHumiCheck = DateTimeOffset.UtcNow;
-                }
-
-
-            if (CheckLightLevel(user, dataSet))
-                if (DateTimeOffset.UtcNow - latestLightCheck > TimeSpan.FromMinutes(20))
-                {
-                    await smsService.SendSmsAsync(user.PhoneNumber, "Light level in green ouse is low.");
-                    latestLightCheck = DateTimeOffset.UtcNow;
-                }
-
-            end:
-            // Todo: Add way to close window again lol.
-*/
-
-            // await mediator.Publish(new PreformActionEvent("Event: Open window."));
-            //
-            // await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
-            //
-            // await mediator.Publish(new PreformActionEvent("Event: Close window."));
-            //
-            // await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
-
-            // add startup sms, shows the app did susscessfuly launch and run this service, 
-            //  await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message + "Error in CalculateActionService.");
         }
     }
 
@@ -147,8 +144,9 @@ public class CalculateActionService(
 
     public bool CheckLightLevel(Config config, List<SensorReading> dataSet)
     {
+        // Tag højde for om natten. 
         if (config.LightLimit >= dataSet.Average(sr => sr.Lux)) return true;
-        return false; // send sms med at der er for meget skygge, slå fra om natten 
+        return false;
     }
 
     public bool CheckTemp(Config config, List<SensorReading> dataSet)
@@ -159,7 +157,7 @@ public class CalculateActionService(
 
     public bool CheckHumi(Config config, List<SensorReading> dataSet)
     {
-        if (config.HumiLimit >= dataSet.Average(sr => sr.Humidity)) return true;
+        if (config.HumiLimit <= dataSet.Average(sr => sr.Humidity)) return true;
         return false;
     }
 }

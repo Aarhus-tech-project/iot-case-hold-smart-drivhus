@@ -21,7 +21,7 @@ public static class DependencyInjection
         // move out at somepoint 
         services.AddHostedService<CalculateActionService>();
 
-        services.AddCustomSerilog(configuration, builder);
+        services.AddCustomSerilog(configuration, builder); // Pretty late to add logging.
 
         return services;
     }

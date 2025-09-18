@@ -1,4 +1,4 @@
-﻿namespace Application.Users.Dtos;
+﻿namespace Application.Configs.Dtos;
 
 public class ConfigDto
 {
