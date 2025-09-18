@@ -2,21 +2,13 @@
 
 public class SensorReadingDto // TODO this map is incorrect
 {
-    public float Humidity { get; set; }
-    public float Temperature { get; set; }
-    public float Pressure { get; set; }
-
-
-    public float DirtHumidity { get; set; }
-
-    public float LightLevel { get; set; }
+    public int Lux { get; set; }
+    public int SoilHumidity { get; set; }
+    public int Temp { get; set; }
+    public int Pressure { get; set; }
+    public int Humidity { get; set; }
+    public int Co2 { get; set; }
+    public int WaterLevel { get; set; }
 }
 
-// Wrong reponse map examble
-//{
-// "humidity": 3,
-// "temperature": 0,
-// "pressure": 3,
-// "dirtHumidity": 0,
-// "lightLevel": 0
-// }
+ 
