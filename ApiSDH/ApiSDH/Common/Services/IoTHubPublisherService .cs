@@ -28,7 +28,7 @@ public class IoTHubPublisherService : IIoTHubPublisherService
 
         var message = new Message(Encoding.UTF8.GetBytes(payload))
         {
-            ExpiryTimeUtc = DateTime.UtcNow.AddMinutes(5) // auto-drop after 5 minutes
+            ExpiryTimeUtc = DateTime.UtcNow.AddMinutes(5) // auto-drop after 5 minutes to avoid que length issues.
         };
 
         await _serviceClient.SendAsync(_targetDeviceId, message);

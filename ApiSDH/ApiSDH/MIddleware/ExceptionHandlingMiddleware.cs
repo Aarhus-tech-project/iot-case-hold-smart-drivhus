@@ -3,10 +3,14 @@ using Application.Common.Interfaces.Services;
 
 namespace ApiSDH.MIddleware;
 
+/// <summary>
+///     ExceptionHandlingMiddleware will handle errors that happen in httpContext/api request flows. When someone calls an
+///     endpoint. This middleware is used.
+///     This middleware does not handle errors in hosted services or app startup.
+/// </summary>
 public class ExceptionHandlingMiddleware(
     RequestDelegate next,
     ILogger<ExceptionHandlingMiddleware> logger,
-    IWebHostEnvironment env,
     ISmsService smsService,
     IConfiguration config)
 {
@@ -14,12 +18,13 @@ public class ExceptionHandlingMiddleware(
     {
         try
         {
-            await next(context); // Proceed to the next middleware or endpoint
+            await next(context);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, ex.Message);
 
+            // Send sms to admin on error if enabled.
             var notifyAdmin = config.GetValue<bool>("SmsLogger:Enabled");
             if (notifyAdmin)
             {

@@ -5,18 +5,21 @@ namespace ApiSDH.Common.Services;
 
 public static class ConfigEnforcementService
 {
+    /// <summary>
+    ///     Ensure there is only 1 config in the system. Service runs once on app startup in <see cref="Program" />
+    /// </summary>
     public static void EnsureSingleConfig(ISensorContext context)
     {
-        var users = context.Configs.ToList();
+        var configs = context.Configs.ToList();
 
-        if (users.Count == 0)
+        if (configs.Count == 0)
         {
             context.Configs.Add(new Config());
             context.SaveChanges();
         }
-        else if (users.Count > 1)
+        else if (configs.Count > 1)
         {
-            throw new InvalidOperationException("Expected exactly 1 user in the system.");
+            throw new InvalidOperationException("Expected exactly 1 config in the system.");
         }
     }
 }

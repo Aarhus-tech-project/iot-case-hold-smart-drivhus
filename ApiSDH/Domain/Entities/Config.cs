@@ -2,7 +2,6 @@
 
 namespace Domain.Entities;
 
-// Todo rename to config.
 public class Config : BaseEntity
 {
     public string PhoneNumber { get; set; } = "+4560592406";
