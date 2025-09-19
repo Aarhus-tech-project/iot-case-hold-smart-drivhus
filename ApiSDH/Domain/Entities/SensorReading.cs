@@ -2,6 +2,9 @@
 
 namespace Domain.Entities;
 
+/// <summary>
+///     Entity for saving sensor data.
+/// </summary>
 public class SensorReading : BaseEntity
 {
     public int Lux { get; set; }

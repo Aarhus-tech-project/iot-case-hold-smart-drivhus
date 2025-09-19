@@ -9,6 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Configs.Commands.Update;
 
+/// <summary>
+///     <see cref="UpdateConfigCommand" /> and <see cref="UpdateConfigCommandHandler" /> are responsible for
+///     updating the user config.
+///     The config includes the users phone number and sensor settings.
+/// </summary>
 public record UpdateConfigCommand(
     string phoneNumber,
     int waterLimit,
@@ -36,8 +41,6 @@ public class UpdateConfigCommandHandler(
 
         // Only 1 config allowed in the system.
         if (configs.Count >= 2) return resultFactory.BadRequest<ConfigDto>();
-
-        // Todo implement all properties 
 
         if (configs[0].PhoneNumber != request.phoneNumber && request.phoneNumber != string.Empty)
             configs[0].PhoneNumber = request.phoneNumber;

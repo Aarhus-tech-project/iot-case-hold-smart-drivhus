@@ -6,13 +6,12 @@ using Twilio.Types;
 
 namespace Infrastructure.Common.Services;
 
-// Todo Move settings
 public class TwilioSettings
 {
     public string TwilioAccountId { get; set; } = string.Empty;
     public string TwilioAuthToken { get; set; } = string.Empty;
     public string FromSenderId { get; set; } = string.Empty;
-    public bool IsEnabled { get; set; } // Unsure of what to set. 
+    public bool IsEnabled { get; set; }
 }
 
 public class SmsService(IOptions<TwilioSettings> options, IStatusService statusService) : ISmsService

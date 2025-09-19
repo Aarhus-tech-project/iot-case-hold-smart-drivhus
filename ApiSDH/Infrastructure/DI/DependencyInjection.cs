@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.DI;
 
+/// <summary>
+///     DI for infrastructure related things.
+/// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration,
@@ -18,7 +21,6 @@ public static class DependencyInjection
 
         services.AddInterfaceImplementations();
 
-        // move out at somepoint 
         services.AddHostedService<CalculateActionService>();
 
         services.AddCustomSerilog(configuration, builder); // Pretty late to add logging.

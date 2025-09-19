@@ -9,6 +9,10 @@ using MediatR;
 
 namespace Application.SensorReadings.Commands.Create;
 
+/// <summary>
+///     <see cref="CreateSensorReadingCommand" /> and <see cref="CreateSensorReadingCommandHandler" /> are responsible for
+///     saving the data from the sensors in the greenhouse.
+/// </summary>
 public record CreateSensorReadingCommand(
     int lux,
     int soil,

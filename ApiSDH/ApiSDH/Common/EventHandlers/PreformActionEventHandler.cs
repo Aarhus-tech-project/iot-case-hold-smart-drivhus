@@ -9,7 +9,7 @@ public class PreformActionEventHandler(IIoTHubPublisherService ioTHubPublisherSe
     : INotificationHandler<PreformActionEvent>
 {
     /// <summary>
-    ///     // Arduino listens for events(<see cref="PreformActionEvent" />). This is how the greenhouse is controlled by the
+    ///     Arduino listens for events(<see cref="PreformActionEvent" />). This is how the greenhouse is controlled by the
     ///     backend.
     ///     Event examples: Open window, water plant and water tank low on water.
     /// </summary>

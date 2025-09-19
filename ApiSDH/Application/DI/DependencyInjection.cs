@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.DI;
 
+/// <summary>
+///     DI for things related to the application layer.
+/// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)

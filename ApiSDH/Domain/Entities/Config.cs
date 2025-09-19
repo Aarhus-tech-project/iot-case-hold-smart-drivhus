@@ -2,6 +2,9 @@
 
 namespace Domain.Entities;
 
+/// <summary>
+///     Entity to store user configs.
+/// </summary>
 public class Config : BaseEntity
 {
     public string PhoneNumber { get; set; } = "+4560592406";
@@ -10,5 +13,5 @@ public class Config : BaseEntity
     public int Co2Limit { get; set; } = 100;
     public int TempLimit { get; set; } = 100;
     public int HumiLimit { get; set; } = 100;
-    public int LightLimit { get; set; } = 100;
+    public int LightLimit { get; set; } = 100; // 10k+ for dagslys 
 }

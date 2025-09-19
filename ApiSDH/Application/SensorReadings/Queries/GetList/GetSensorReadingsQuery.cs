@@ -10,13 +10,13 @@ namespace Application.SensorReadings.Queries.GetList;
 
 public record GetSensorReadingsQuery : IRequest<Result<List<SensorReadingDto>>>;
 
+// Not in use.
 public class GetSensorReadingsQueryHandler(ISensorContext sensorContext, IResultFactory resultFactory, IMapper mapper)
     : IRequestHandler<GetSensorReadingsQuery, Result<List<SensorReadingDto>>>
 {
     public async Task<Result<List<SensorReadingDto>>> Handle(GetSensorReadingsQuery request,
         CancellationToken cancellationToken)
     {
-        // order by newest 
         var listToReturn = await sensorContext.SensorReadings.AsNoTracking().Take(200)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);

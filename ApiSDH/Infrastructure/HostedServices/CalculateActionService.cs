@@ -10,6 +10,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.HostedServices;
 
+/// <summary>
+///     <see cref="CalculateActionService" /> is responsible for controlling the greenhouse. It monitors sensor data and
+///     takes action if appropriate.
+/// </summary>
 public class CalculateActionService(
     IServiceScopeFactory scopeFactory,
     IMediator mediator,

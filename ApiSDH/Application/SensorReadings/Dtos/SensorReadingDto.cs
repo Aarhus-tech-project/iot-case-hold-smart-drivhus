@@ -1,6 +1,6 @@
 ﻿namespace Application.SensorReadings.Dtos;
 
-public class SensorReadingDto // TODO this map is incorrect
+public class SensorReadingDto
 {
     public int Lux { get; set; }
     public int SoilHumidity { get; set; }
@@ -10,5 +10,3 @@ public class SensorReadingDto // TODO this map is incorrect
     public int Co2 { get; set; }
     public int WaterLevel { get; set; }
 }
-
- 

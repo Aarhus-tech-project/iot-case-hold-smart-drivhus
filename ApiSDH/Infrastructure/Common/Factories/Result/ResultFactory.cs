@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Factories;
 using Application.Common.Models;
 
-namespace Infrastructure.InterfaceImplementations.Factories.Result;
+namespace Infrastructure.Common.Factories.Result;
 
 public class ResultFactory : IResultFactory
 {

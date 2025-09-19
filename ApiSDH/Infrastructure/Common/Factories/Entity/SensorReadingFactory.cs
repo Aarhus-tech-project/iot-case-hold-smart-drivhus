@@ -2,7 +2,7 @@
 using Application.SensorReadings.Commands.Create;
 using Domain.Entities;
 
-namespace Infrastructure.InterfaceImplementations.Factories.Entity;
+namespace Infrastructure.Common.Factories.Entity;
 
 public class SensorReadingFactory : ISensorReadingFactory
 {
