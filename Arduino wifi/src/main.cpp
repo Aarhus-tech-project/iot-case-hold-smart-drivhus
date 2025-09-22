@@ -20,7 +20,7 @@ const char* url = "https://webappnamename-dkfxb8g3eubvhabr.swedencentral-01.azur
 const char* HUB    = "GreenHouseIotHub.azure-devices.net";
 const char* DEVICE = "WifiArduino";
 const char* USER   = "GreenHouseIotHub.azure-devices.net/WifiArduino/?api-version=2021-04-12";
-const char* PASS   = "SharedAccessSignature ...";
+const char* PASS   = "SharedAccessSignature sr=GreenHouseIotHub.azure-devices.net%2Fdevices%2FWifiArduino&sig=3p1bp2LAgmvLzPfqBO9EGkpV58rhdgGUQvEJz%2BBuyuQ%3D&se=1789112160";
 
 WiFiClientSecure net;
 PubSubClient mqtt(net);
@@ -35,19 +35,6 @@ void connectWiFi() {
   Serial.println("WiFi connected!");
 }
 
-
-void connectAzure() {
-  net.setInsecure();
-  mqtt.setServer(HUB, 8883);
-  mqtt.setCallback(onMessage);
-  while (!mqtt.connected()) {
-    mqtt.connect(DEVICE, USER, PASS);
-  }
-  mqtt.subscribe("devices/WifiArduino/messages/devicebound/#");
-  Serial.println("Connected to Azure IoT Hub!");
-}
-
-
 void onMessage(char* topic, byte* payload, unsigned int len) {
   String msg;
   while (len--) msg += (char)*payload++;
@@ -59,7 +46,22 @@ void onMessage(char* topic, byte* payload, unsigned int len) {
   LoRa.print(msg);
   LoRa.endPacket();
 }
+
+void connectAzure() 
+{
+  Serial.println("Trying azure");
+  net.setInsecure();
+  mqtt.setServer(HUB, 8883);
+  mqtt.setCallback(onMessage);
+  while (!mqtt.connected()) {
+    mqtt.connect(DEVICE, USER, PASS);
+  }
+  mqtt.subscribe("devices/WifiArduino/messages/devicebound/#");
+  Serial.println("Connected to Azure IoT Hub!");
+}
+
 void postToAPI(String payload) {
+  Serial.println("Trying PostAPI");
   if (WiFi.status() != WL_CONNECTED) return;
 
   WiFiClientSecure client;
@@ -97,11 +99,17 @@ void loop() {
     while (LoRa.available()) {
       incoming += (char)LoRa.read();
     }
-    Serial.print("LoRa -> API: ");
-    Serial.println(incoming);
+  if (incoming.startsWith("greenhousedata"))
+    {
+      incoming.remove(0, String("greenhousedata").length());
+      
+      Serial.print("LoRa -> API: ");
+      Serial.println(incoming);
 
-    // Forward sensor data to API
-    postToAPI(incoming);
+      
+      // Forward sensor data to API
+      postToAPI(incoming);
+    }
   }
 
   // --- KEEP MQTT LOOP ALIVE ---
