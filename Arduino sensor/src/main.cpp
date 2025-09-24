@@ -6,13 +6,13 @@
 #include "Adafruit_TSL2591.h"
 #include "Adafruit_CCS811.h"
 
-// Motor
+//Motor
 #define FREQ 60
 #define STOP_US 1425
 Adafruit_PWMServoDriver pwm(0x40);
 const int CH = 15; 
 
-// Lora pins
+//Lora 
 #define SS 10
 #define RST 9
 #define DIO0 2
@@ -20,9 +20,9 @@ const int CH = 15;
 //Pumpe
 const unsigned int IN1 = 7;
 const unsigned int IN2 = 8;
-const unsigned int EN = 9;
+const unsigned int EN = 6;
 
-// Sensor pins
+//Sensor 
 #define ledPin 2
 #define soilPin A5
 #define waterPin A0
@@ -31,6 +31,7 @@ Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 Adafruit_BME280 bme;
 Adafruit_CCS811 ccs;
 
+//payload variabler
 int lux;
 int temp;
 int tryk;
@@ -40,8 +41,10 @@ int vandmaengde;
 int jordfugtighed;
 String command;
 
+//LoRa delay foranstaltninger
 unsigned long lastSend = 0;
-const unsigned long sendInterval = 60000; // 1 minute
+const unsigned long sendInterval = 60000;
+
 void startCSS() {
   Serial.println("CCS811 init...");
   if (!ccs.begin()) {
@@ -51,22 +54,21 @@ void startCSS() {
   while (!ccs.available());
 }
 
-void startMotor()
-{
+void startMotor() {
     pwm.begin();
   pwm.setOscillatorFrequency(25000000);
   pwm.setPWMFreq(FREQ);
 
-  pwm.writeMicroseconds(CH, STOP_US); delay(1000); // stop (continuous servo)
+  pwm.writeMicroseconds(CH, STOP_US); delay(1000); //nulstil motor
   delay(10);
   Serial.println("Motors started");
 }
 
-void setupPumpe()
-{
+void setupPumpe() {
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(EN, OUTPUT);
+  Serial.println("Pumpe started");
 }
 
 void startBME() {
@@ -78,7 +80,7 @@ void startBME() {
 }
 
 void configureTSL2591() {
-  tsl.setGain(TSL2591_GAIN_MED);              // 25x gain
+  tsl.setGain(TSL2591_GAIN_MED);
   tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
 }
 
@@ -87,33 +89,31 @@ void motorHub(String command)
   Serial.println("motorhub entered");
   if (command == "openWindow")
   {
-    pwm.writeMicroseconds(CH, 1000); delay(1000); // one direction
-    pwm.writeMicroseconds(CH, STOP_US); delay(1000); // stop (continuous servo)
+    pwm.writeMicroseconds(CH, 1000); delay(1000);
+    pwm.writeMicroseconds(CH, STOP_US); delay(1000);
       Serial.println("window open");
-
   }
   else if (command == "closeWindow")
   {
-    pwm.writeMicroseconds(CH, 2000); delay(1000); // other direction
-    pwm.writeMicroseconds(CH, STOP_US); delay(1000); // stop (continuous servo)
+    pwm.writeMicroseconds(CH, 2000); delay(1000);
+    pwm.writeMicroseconds(CH, STOP_US); delay(1000);
       Serial.println("window closed");
   }
 }
 
-void pumpeHub(String command)
-{
+void pumpeHub(String command) {
   if (command == "startPumpe")
   {
-       // Forward full speed
+  Serial.println("Pumpe running");
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
-  analogWrite(EN, 255);  // 0–255 (speed control)
+  analogWrite(EN, 255);  // 0–255 kontrol
   delay(2000);
 
-  // Stop
+  Serial.println("Pumpe stopping");
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
-  analogWrite(EN, 0);
+  analogWrite(EN, 0); // 0-255 kontrol
   delay(2000);
   }
 }
@@ -126,6 +126,15 @@ void startTSL2591() {
     Serial.println("No TSL2591 found");
     while (1);
   }
+}
+
+void setupLoRa() {
+    LoRa.setPins(SS, RST, DIO0);
+  if (!LoRa.begin(433E6)) {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+    Serial.println("LoRa ready");  
 }
 
 int readBelysning() {
@@ -145,18 +154,17 @@ int readJordFugtighed() {
   return jordfugtighed;
 }
 
-int readTemp() 
-{
+int readTemp() {
   Serial.println(bme.readTemperature());
   return bme.readTemperature(); 
 }
-int readTryk() 
-{ 
+
+int readTryk() { 
   Serial.println(bme.readPressure() / 100.0F);
   return bme.readPressure() / 100.0F; 
 }
-int readFugtighed() 
-{ 
+
+int readFugtighed() { 
   Serial.println(bme.readHumidity());
   return bme.readHumidity(); 
 }
@@ -177,22 +185,12 @@ int readVandSensor() {
 }
 
 void setup() {
-
   Serial.begin(9600);
 
-  // Setup LoRa
-  LoRa.setPins(SS, RST, DIO0);
-  if (!LoRa.begin(433E6)) {
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
-    Serial.println("LoRa ready"); // doesthis chck if lora is actually correctly setup and actauly would work 
-
-  // setup all sensors 
-  startMotor();
+  // setup alle sensorer
+  setupLoRa();
   setupPumpe();
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
+  startMotor();
   startTSL2591();
   startBME();
   startCSS();
@@ -200,7 +198,7 @@ void setup() {
 }
 
 void loop() {
-  // --- ALWAYS LISTEN ---
+  // LoRa
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     String msg = "";
@@ -210,12 +208,9 @@ void loop() {
     Serial.print("Received command: ");
     Serial.println(msg);
 
-    // Example: simple LED command, will be event for green house handling 
-    if (msg == "LEDON") digitalWrite(ledPin, HIGH);
-    if (msg == "LEDOFF") digitalWrite(ledPin, LOW);
     if (msg == "Entity: Data: Event: Open window.") motorHub("openWindow");
     if (msg == "Entity: Data: Event: Close window.") motorHub("closeWindow");
-    if (msg == "Entity: Data: Event: Start pumpe.") pumpeHub("startPumpe");
+    if (msg == "Entity: Data: Event: Soil Moisture low.") pumpeHub("startPumpe");
   }
 
   unsigned long now = millis();
