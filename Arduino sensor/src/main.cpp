@@ -22,8 +22,7 @@ const unsigned int IN1 = 7;
 const unsigned int IN2 = 8;
 const unsigned int EN = 6;
 
-//Sensor 
-#define ledPin 2
+//Jordfugtigheds sensor 
 #define soilPin A5
 #define waterPin A0
 
@@ -46,10 +45,10 @@ unsigned long lastSend = 0;
 const unsigned long sendInterval = 60000;
 
 void startCSS() {
-  Serial.println("CCS811 init...");
+  Serial.println("CCS811 ready");
   if (!ccs.begin()) {
     Serial.println("Failed to start CCS811! Check wiring.");
-    while (1);
+    while (1);  
   }
   while (!ccs.available());
 }
@@ -149,7 +148,7 @@ int readBelysning() {
 int readJordFugtighed() {
   int sensorValue = analogRead(soilPin);
   jordfugtighed = map(sensorValue, 0, 1023, 255, 0);
-  analogWrite(ledPin, jordfugtighed);
+  analogWrite(soilPin, jordfugtighed);
   Serial.println(jordfugtighed);
   return jordfugtighed;
 }
